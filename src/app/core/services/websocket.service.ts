@@ -17,7 +17,7 @@ export class WebSocketService {
     
     if (!connection) {
       const url = this.binanceApiService.getOrderBookWebSocketUrl(symbol);
-      connection = webSocket<OrderBookWebSocketData>(url);
+      connection = this.webSocketFactory<OrderBookWebSocketData>(url);
       this.connections.set(symbol, connection);
     }
     
@@ -35,5 +35,9 @@ export class WebSocketService {
   closeAllConnections(): void {
     this.connections.forEach(connection => connection.complete());
     this.connections.clear();
+  }
+
+  protected webSocketFactory<T>(url: string): WebSocketSubject<T> {
+    return webSocket<T>(url);
   }
 } 
