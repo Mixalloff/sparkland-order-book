@@ -1,0 +1,54 @@
+@use 'styles/breakpoints' as *;
+
+$gap: 20px;
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+h1 {
+  margin-bottom: 20px;
+  color: var(--text-primary);
+}
+
+.sticky-selector {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  padding: 15px 0;
+  margin: -15px 0;
+  border-radius: 0 0 8px 8px;
+}
+
+.order-books-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $gap;
+
+  &__order-book {
+    /* On small screens one in a row */
+    flex: 0 0 100%;
+    
+    /* On medium and large screens two in a row */
+    @media (min-width: $breakpoint-lg) {
+      flex: 0 0 calc(50% - $gap / 2);
+    }
+  }
+}
+
+.no-books {
+  width: 100%;
+  padding: 30px;
+  text-align: center;
+  background-color: var(--bg-secondary);
+  border-radius: 8px;
+  margin-top: 20px;
+  box-shadow: var(--card-shadow);
+  
+  p {
+    color: var(--text-muted);
+    font-style: italic;
+  }
+} 

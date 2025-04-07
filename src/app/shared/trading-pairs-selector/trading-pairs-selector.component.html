@@ -1,0 +1,43 @@
+<div class="trading-pairs-selector">
+  
+  @if (isLoading()) {
+    <sprk-loader message="Loading trading pairs..."></sprk-loader>
+  } @else {
+    <div class="form-group">
+      <label for="pairSelect">Select Trading Pair:</label>
+    
+      <form class="trading-pairs-selector__form">
+        <select
+          id="pairSelect"
+          [formControl]="selectedPairControl"
+          class="form-control">
+          <option [value]="null" disabled>Select a trading pair</option>
+          @for (pair of availablePairs(); track pair.symbol) {
+            <option [value]="pair.symbol">
+              {{ pair.baseAsset }}/{{ pair.quoteAsset }}
+            </option>
+          }
+        </select>
+    
+        <button
+          (click)="addPair()"
+          class="btn btn-primary"
+          [disabled]="!isFormValid()">
+          Add Order Book
+        </button>
+      </form>
+    </div>
+  }
+  
+  @if (error()) {
+    <div class="error">
+      {{ error() }}
+    </div>
+  }
+  
+  @if (allPairsAdded()) {
+    <div class="info">
+      All pairs added
+    </div>
+  }
+</div> 

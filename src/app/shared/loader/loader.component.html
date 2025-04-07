@@ -1,0 +1,8 @@
+<div class="loading">
+  @if (showSpinner()) {
+    <div class="spinner"></div>
+  }
+  @if (message()) {
+    <p class="message">{{ message() }}</p>
+  }
+</div>

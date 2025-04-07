@@ -1,0 +1,26 @@
+<div class="container">
+  <h1>Binance Order Book</h1>
+  
+  <div class="sticky-selector">
+    <sprk-trading-pairs-selector
+      [selectedSymbols]="selectedSymbols()"
+      (pairSelected)="onPairSelected($event)"
+    ></sprk-trading-pairs-selector>
+  </div>
+  
+  <div class="order-books-container">
+    @for (symbol of selectedSymbols(); track symbol) {
+      <sprk-order-book
+        class="order-books-container__order-book"
+        [symbol]="symbol"
+        (remove)="removeOrderBook(symbol)"
+      ></sprk-order-book>
+    }
+    
+    @if (selectedSymbols().length === 0) {
+      <div class="no-books">
+        <p>No order books added yet. Select a trading pair to add an order book.</p>
+      </div>
+    }
+  </div>
+</div> 

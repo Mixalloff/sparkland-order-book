@@ -1,0 +1,72 @@
+.trading-pairs-selector {
+  margin-bottom: 1.25rem;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  background-color: var(--bg-primary);
+  box-shadow: var(--card-shadow);
+  border: 1px solid var(--card-border);
+
+  &__form {
+    display: flex;
+    gap: 1rem;
+  }
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+  color: var(--text-primary);
+}
+
+.form-control {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid var(--input-border);
+  border-radius: 4px;
+  font-size: 14px;
+  background-color: var(--input-bg);
+  color: var(--text-primary);
+}
+
+.btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.btn-primary {
+  background-color: var(--primary);
+  color: white;
+  
+  &:hover:not(:disabled) {
+    background-color: var(--primary-hover);
+  }
+}
+
+.btn:disabled {
+  background-color: var(--button-disabled);
+  cursor: not-allowed;
+}
+
+.error, .info {
+  margin-top: 10px;
+  padding: 8px;
+  border-radius: 4px;
+}
+
+.error {
+  background-color: var(--error-bg);
+  color: var(--error-text);
+}
+
+.info {
+  background-color: var(--info-bg);
+  color: var(--info-text);
+} 

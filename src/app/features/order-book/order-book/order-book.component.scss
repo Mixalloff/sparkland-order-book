@@ -1,0 +1,112 @@
+@use 'styles/breakpoints' as *;
+
+.order-book {
+  width: 100%;
+  border-radius: 8px;
+  box-shadow: var(--card-shadow);
+  overflow: hidden;
+  background-color: var(--card-bg);
+  
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+    background: var(--bg-tertiary);
+    border-bottom: 1px solid var(--border-color);
+  }
+}
+
+h3 {
+  margin: 0;
+  font-size: 16px;
+  color: var(--text-primary);
+}
+
+.remove-btn {
+  background: var(--danger);
+  border: none;
+  border-radius: 4px;
+  color: white;
+  padding: 4px 8px;
+  cursor: pointer;
+}
+
+.order-book-content {
+  padding: 10px;
+}
+
+.book-container {
+  display: flex;
+  flex-direction: column;
+  
+  /* Shows bids and asks side by side on medium and large screens */
+  @media (min-width: $breakpoint-sm) {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+}
+
+.bids, .asks {
+  flex: 1;
+  width: 100%;
+  
+  @media (min-width: $breakpoint-sm) {
+    max-width: 48%;
+  }
+}
+
+.table-title {
+  margin-left: 5px;
+  color: var(--text-primary);
+}
+
+/* Add margin between bids and asks on small screens */
+.bids {
+  margin-bottom: 15px;
+  
+  @media (min-width: $breakpoint-sm) {
+    margin-bottom: 0;
+  }
+}
+
+.table-header {
+  display: flex;
+  border-bottom: 1px solid var(--border-color);
+  font-weight: bold;
+  padding: 5px 0;
+
+  .col {
+    color: var(--text-secondary);
+  }
+}
+
+.table-row {
+  display: flex;
+  padding: 5px 0;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.col {
+  flex: 1;
+  text-align: left;
+  padding: 0 5px;
+  color: var(--text-primary);
+}
+
+.price {
+  &.buy {
+    color: var(--bid-color);
+  }
+
+  &.sell {
+    color: var(--ask-color);
+  }
+}
+
+.no-data {
+  padding: 15px 0;
+  text-align: center;
+  color: var(--text-muted);
+  font-style: italic;
+} 

@@ -1,0 +1,53 @@
+<div class="order-book">
+  <div class="order-book__header">
+    <h3 class="order-book__title">Order Book: {{ symbol() }}</h3>
+    <button class="remove-btn" (click)="onRemove()">Remove</button>
+  </div>
+
+  @if (isLoading()) {
+    <sprk-loader message="Loading order book data..."></sprk-loader>
+  } @else {
+    <div class="order-book-content">
+      <div class="book-container">
+
+        <div class="bids">
+          <h3 class="table-title">Bids</h3>
+          <div class="table-header">
+            <div class="col">Price</div>
+            <div class="col">Quantity</div>
+          </div>
+          
+          @for (bid of orderBookData().bids; track bid.price) {
+            <div class="table-row">
+              <div class="col price buy">{{ bid.price }}</div>
+              <div class="col">{{ bid.quantity }}</div>
+            </div>
+          }
+          
+          @if (orderBookData().bids.length === 0) {
+            <div class="no-data">No bids available</div>
+          }
+        </div>
+        
+        <div class="asks">
+          <h3 class="table-title">Asks</h3>
+          <div class="table-header">
+            <div class="col">Price</div>
+            <div class="col">Quantity</div>
+          </div>
+          
+          @for (ask of orderBookData().asks; track ask.price) {
+            <div class="table-row">
+              <div class="col price sell">{{ ask.price }}</div>
+              <div class="col">{{ ask.quantity }}</div>
+            </div>
+          }
+          
+          @if (orderBookData().asks.length === 0) {
+            <div class="no-data">No asks available</div>
+          }
+        </div>
+      </div>
+    </div>
+  }
+</div> 
