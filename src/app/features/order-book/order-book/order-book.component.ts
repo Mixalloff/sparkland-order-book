@@ -33,7 +33,7 @@ export class OrderBookComponent implements OnInit, OnDestroy {
   }
   
   ngOnDestroy(): void {
-    this.webSocketService.closeConnection(this.symbol());
+    this.disconnectFromOrderBookStream();
   }
   
   onRemove(): void {
@@ -43,15 +43,18 @@ export class OrderBookComponent implements OnInit, OnDestroy {
   private connectToOrderBookStream(): void {
     this.webSocketService.getOrderBookStream(this.symbol())
       .pipe(
-        takeUntilDestroyed(this.destroyRef),
         tap(data => this.updateOrderBook(data)),
         catchError(error => {
-          console.error('WebSocket error:', error);
-          this.isLoading.set(false);
+          console.error('Error connecting to order book stream:', error);
           return EMPTY;
-        })
+        }),
+        takeUntilDestroyed(this.destroyRef)
       )
       .subscribe();
+  }
+  
+  private disconnectFromOrderBookStream(): void {
+    this.webSocketService.closeConnection(this.symbol());
   }
   
   private updateOrderBook(data: OrderBookWebSocketData): void {

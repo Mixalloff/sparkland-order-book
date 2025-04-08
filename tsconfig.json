@@ -25,12 +25,20 @@
       "@features/*": ["src/app/features/*"],
       "@models/*": ["src/app/core/models/*"],
       "@services/*": ["src/app/core/services/*"]
-    }
+    },
+    "useDefineForClassFields": false,
+    "allowSyntheticDefaultImports": true,
+    "removeComments": true,
+    "sourceMap": false,
+    "declaration": false
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,
     "strictInjectionParameters": true,
     "strictInputAccessModifiers": true,
-    "strictTemplates": true
+    "strictTemplates": true,
+    "compilationMode": "full",
+    "enableResourceInlining": true,
+    "disableTypeScriptVersionCheck": true
   }
 }

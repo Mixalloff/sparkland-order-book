@@ -5,8 +5,12 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
+    "build:prod": "ng build --configuration=production --optimization",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "analyze": "ng build --configuration=analyzer && npx source-map-explorer dist/sparkland-order-book/browser/*.js",
+    "analyze:source-map": "source-map-explorer dist/sparkland-order-book/browser/*.js",
+    "postinstall": "ngcc --properties es2023 browser module main"
   },
   "private": true,
   "dependencies": {
@@ -25,6 +29,7 @@
     "@angular-devkit/build-angular": "^19.2.3",
     "@angular/cli": "^19.2.3",
     "@angular/compiler-cli": "^19.2.0",
+    "@ngx-builders/analyze": "^4.0.0",
     "@types/jasmine": "~5.1.0",
     "jasmine-core": "~5.6.0",
     "karma": "~6.4.0",
@@ -33,6 +38,8 @@
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
     "ng-mocks": "^14.13.4",
-    "typescript": "~5.7.2"
+    "source-map-explorer": "^2.5.3",
+    "typescript": "~5.7.2",
+    "webpack-bundle-analyzer": "^4.10.2"
   }
 }

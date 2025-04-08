@@ -39,23 +39,44 @@
                 "src"
               ]
             },
-            "scripts": []
+            "scripts": [],
+            "preserveSymlinks": true,
+            "optimization": {
+              "scripts": true,
+              "styles": {
+                "minify": true,
+                "inlineCritical": true
+              },
+              "fonts": true
+            }
           },
           "configurations": {
             "production": {
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "500kB",
-                  "maximumError": "1MB"
+                  "maximumWarning": "500kb",
+                  "maximumError": "1mb"
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "4kB",
-                  "maximumError": "8kB"
+                  "maximumWarning": "2kb",
+                  "maximumError": "4kb"
                 }
               ],
-              "outputHashing": "all"
+              "outputHashing": "all",
+              "sourceMap": false,
+              "namedChunks": false,
+              "extractLicenses": true,
+              "optimization": true
+            },
+            "analyzer": {
+              "outputHashing": "all",
+              "sourceMap": true,
+              "namedChunks": true,
+              "extractLicenses": true,
+              "optimization": true,
+              "statsJson": true
             },
             "development": {
               "optimization": false,
@@ -73,6 +94,9 @@
             },
             "development": {
               "buildTarget": "sparkland-order-book:build:development"
+            },
+            "analyzer": {
+              "buildTarget": "sparkland-order-book:build:analyzer"
             }
           },
           "defaultConfiguration": "development"
@@ -104,6 +128,12 @@
               ]
             },
             "scripts": []
+          }
+        },
+        "analyze": {
+          "builder": "@ngx-builders/analyze:analyze",
+          "options": {
+            "outputPath": "dist/stats.json"
           }
         }
       }
