@@ -51,6 +51,26 @@ h3 {
   flex-grow: 1;
 }
 
+.error-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  flex-grow: 1;
+
+  &__message {
+    margin-bottom: 10px;
+  }
+
+  &__reconnect-btn {
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 4px 8px;
+  }
+}
+
 .book-container {
   display: flex;
   flex-direction: column;

@@ -4,11 +4,7 @@
     <button class="remove-btn" (click)="onRemove()">Remove</button>
   </div>
 
-  @if (isLoading()) {
-    <div class="loader-container">
-      <sprk-loader message="Loading order book data..."></sprk-loader>
-    </div>
-  } @else {
+  @if (!isLoading() && !isError()) {
     <div class="order-book-content">
       <div class="book-container">
 
@@ -50,6 +46,17 @@
           }
         </div>
       </div>
+    </div>
+  } @else if (isLoading()) {
+    <div class="loader-container">
+      <sprk-loader message="Loading order book data..."></sprk-loader>
+    </div>
+  } @else {
+    <div class="error-container">
+      <div class="error-container__message">
+        Error loading order book data. Please try again later.
+      </div>
+      <button class="error-container__reconnect-btn" (click)="onReconnect()">Reconnect</button>
     </div>
   }
 </div> 
