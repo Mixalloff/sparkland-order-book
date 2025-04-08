@@ -1,6 +1,7 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { TradingPairsSelectorComponent } from '@shared/trading-pairs-selector/trading-pairs-selector.component';
 import { OrderBookComponent } from '@features/order-book/order-book/order-book.component';
+import { OrderBookFacade } from '@features/order-book/services/order-book.facade';
 
 @Component({
   selector: 'sprk-order-books-container',
@@ -10,16 +11,21 @@ import { OrderBookComponent } from '@features/order-book/order-book/order-book.c
   styleUrls: ['./order-books-container.component.scss']
 })
 export class OrderBooksContainerComponent {
-  selectedSymbols = signal<string[]>([]);
+  // Use the facade's selectedSymbols
+  private readonly orderBookFacade = inject(OrderBookFacade);
+  
+  // Expose the symbols signal from the facade for the template
+  get selectedSymbols() {
+    return this.orderBookFacade.selectedSymbols;
+  }
   
   onPairSelected(symbol: string): void {
-    // Check if the symbol is already in the list
-    if (!this.selectedSymbols().includes(symbol)) {
-      this.selectedSymbols.update(symbols => [...symbols, symbol]);
-    }
+    // Delegate the logic to the facade
+    this.orderBookFacade.addSymbol(symbol);
   }
   
   removeOrderBook(symbol: string): void {
-    this.selectedSymbols.update(symbols => symbols.filter(s => s !== symbol));
+    // Delegate the removal to the facade
+    this.orderBookFacade.removeSymbol(symbol);
   }
 } 
