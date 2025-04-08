@@ -56,7 +56,7 @@ export class OrderBookComponent implements OnInit, OnDestroy {
     this.isError.set(false);
     this.isLoading.set(true);
 
-    // Set isLoading to false after the first data is received
+    // Set isLoading to false after the first data is received and start checking for connection timeout
     stream$.pipe(
       takeUntilDestroyed(this.destroyRef),
       take(1),

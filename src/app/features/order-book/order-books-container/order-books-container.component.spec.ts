@@ -1,117 +1,119 @@
 import { OrderBooksContainerComponent } from './order-books-container.component';
-import { TradingPairsSelectorComponent } from '@shared/trading-pairs-selector/trading-pairs-selector.component';
+import { MockBuilder, MockRender, ngMocks, MockedComponentFixture } from 'ng-mocks';
 import { OrderBookComponent } from '@features/order-book/order-book/order-book.component';
-import { MockBuilder, MockRender, ngMocks } from 'ng-mocks';
+import { OrderBookFacade } from '@features/order-book/services/order-book.facade';
+import { TradingPairsSelectorComponent } from '@shared/trading-pairs-selector/trading-pairs-selector.component';
+import { signal } from '@angular/core';
 
 describe('OrderBooksContainerComponent', () => {
+  let component: OrderBooksContainerComponent;
+  let fixture: MockedComponentFixture<OrderBooksContainerComponent>;
+  let orderBookFacadeMock: jasmine.SpyObj<OrderBookFacade>;
+
   beforeEach(() => {
+    // Arrange
+    orderBookFacadeMock = jasmine.createSpyObj('OrderBookFacade', 
+      ['addSymbol', 'removeSymbol'],
+      {
+        selectedSymbols: signal<string[]>([])
+      }
+    );
+
     return MockBuilder(OrderBooksContainerComponent)
+      .mock(OrderBookComponent)
       .mock(TradingPairsSelectorComponent)
-      .mock(OrderBookComponent);
+      .provide({
+        provide: OrderBookFacade,
+        useValue: orderBookFacadeMock
+      });
   });
 
-  it('should create', () => {
-    // Arrange & Act
-    const fixture = MockRender(OrderBooksContainerComponent);
-    
-    // Assert
-    expect(fixture.point.componentInstance).toBeTruthy();
-  });
-
-  it('should add a symbol when pairSelected is emitted', () => {
+  beforeEach(() => {
     // Arrange
-    const fixture = MockRender(OrderBooksContainerComponent);
-    const component = fixture.point.componentInstance;
-    const selectorEl = ngMocks.find(TradingPairsSelectorComponent);
-    const pairSelector = ngMocks.get(selectorEl, TradingPairsSelectorComponent);
+    fixture = MockRender(OrderBooksContainerComponent);
+    component = fixture.point.componentInstance;
+  });
+
+  it('should create the component', () => {
+    // Assert
+    expect(component).toBeTruthy();
+  });
+
+  it('should add a symbol when onPairSelected is called', () => {
+    // Arrange
+    const symbol = 'BTCUSDT';
     
     // Act
-    pairSelector.pairSelected.emit('BTCUSDT');
+    component.onPairSelected(symbol);
     
     // Assert
-    expect(component.selectedSymbols().length).toBe(1);
-    expect(component.selectedSymbols()[0]).toBe('BTCUSDT');
-  });
-
-  it('should not add duplicate symbols', () => {
-    // Arrange
-    const fixture = MockRender(OrderBooksContainerComponent);
-    const component = fixture.point.componentInstance;
-    
-    // Act
-    component.onPairSelected('BTCUSDT');
-    component.onPairSelected('BTCUSDT');
-    
-    // Assert
-    expect(component.selectedSymbols().length).toBe(1);
-    expect(component.selectedSymbols()[0]).toBe('BTCUSDT');
+    expect(orderBookFacadeMock.addSymbol).toHaveBeenCalledWith(symbol);
   });
 
   it('should remove a symbol when removeOrderBook is called', () => {
     // Arrange
-    const fixture = MockRender(OrderBooksContainerComponent);
-    const component = fixture.point.componentInstance;
-    component.onPairSelected('BTCUSDT');
-    component.onPairSelected('ETHUSDT');
+    const symbolToRemove = 'BTCUSDT';
     
     // Act
-    component.removeOrderBook('BTCUSDT');
+    component.removeOrderBook(symbolToRemove);
     
     // Assert
-    expect(component.selectedSymbols().length).toBe(1);
-    expect(component.selectedSymbols()[0]).toBe('ETHUSDT');
+    expect(orderBookFacadeMock.removeSymbol).toHaveBeenCalledWith(symbolToRemove);
   });
-  
-  it('should pass selectedSymbols to trading-pairs-selector as input', () => {
+
+  it('should display OrderBook components for each selected symbol', () => {
     // Arrange
-    const fixture = MockRender(OrderBooksContainerComponent);
-    const component = fixture.point.componentInstance;
-    component.onPairSelected('BTCUSDT');
+    orderBookFacadeMock.selectedSymbols.set(['BTCUSDT', 'ETHUSDT']);
     
     // Act
-    fixture.detectChanges();
-    
-    // Assert
-    const selectorEl = ngMocks.find(TradingPairsSelectorComponent);
-    const inputValue = ngMocks.input(selectorEl, 'selectedSymbols');
-    expect(inputValue).toEqual(component.selectedSymbols());
-  });
-  
-  it('should render order-book component for each selected symbol', () => {
-    // Arrange
-    const fixture = MockRender(OrderBooksContainerComponent);
-    const component = fixture.point.componentInstance;
-    
-    // Act
-    component.onPairSelected('BTCUSDT');
-    component.onPairSelected('ETHUSDT');
     fixture.detectChanges();
     
     // Assert
     const orderBookElements = ngMocks.findAll(OrderBookComponent);
     expect(orderBookElements.length).toBe(2);
     
-    // Verify inputs passed to the order books
-    const firstOrderBook = ngMocks.input(orderBookElements[0], 'symbol');
-    const secondOrderBook = ngMocks.input(orderBookElements[1], 'symbol');
-    expect(firstOrderBook).toBe('BTCUSDT');
-    expect(secondOrderBook).toBe('ETHUSDT');
+    expect(ngMocks.input(orderBookElements[0], 'symbol')).toBe('BTCUSDT');
+    expect(ngMocks.input(orderBookElements[1], 'symbol')).toBe('ETHUSDT');
   });
-  
-  it('should remove order book when remove event is emitted', () => {
+
+  it('should call removeOrderBook when remove event is emitted from OrderBook component', () => {
     // Arrange
-    const fixture = MockRender(OrderBooksContainerComponent);
-    const component = fixture.point.componentInstance;
-    component.onPairSelected('BTCUSDT');
+    orderBookFacadeMock.selectedSymbols.set(['BTCUSDT']);
     fixture.detectChanges();
     
-    const orderBookEl = ngMocks.find(OrderBookComponent);
-    const orderBook = ngMocks.get(orderBookEl, OrderBookComponent);
+    spyOn(component, 'removeOrderBook');
     
     // Act
-    orderBook.remove.emit();
+    const orderBookElement = ngMocks.find(OrderBookComponent);
+    ngMocks.output(orderBookElement, 'remove').emit();
     
     // Assert
-    expect(component.selectedSymbols().length).toBe(0);
+    expect(component.removeOrderBook).toHaveBeenCalledWith('BTCUSDT');
+  });
+
+  it('should display a message when there are no selected symbols', () => {
+    // Arrange
+    orderBookFacadeMock.selectedSymbols.set([]);
+    
+    // Act
+    fixture.detectChanges();
+    
+    // Assert
+    expect(() => ngMocks.find(OrderBookComponent)).toThrow();
+    const emptyMessage = ngMocks.find(fixture, '.no-books');
+    expect(emptyMessage).toBeTruthy();
+  });
+
+  it('should handle pairSelected event from TradingPairsSelector', () => {
+    // Arrange
+    const symbol = 'ETHUSDT';
+    spyOn(component, 'onPairSelected');
+    
+    // Act
+    const selectorElement = ngMocks.find(TradingPairsSelectorComponent);
+    ngMocks.output(selectorElement, 'pairSelected').emit(symbol);
+    
+    // Assert
+    expect(component.onPairSelected).toHaveBeenCalledWith(symbol);
   });
 }); 
