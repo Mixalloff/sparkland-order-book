@@ -5,7 +5,9 @@
   </div>
 
   @if (isLoading()) {
-    <sprk-loader message="Loading order book data..."></sprk-loader>
+    <div class="loader-container">
+      <sprk-loader message="Loading order book data..."></sprk-loader>
+    </div>
   } @else {
     <div class="order-book-content">
       <div class="book-container">

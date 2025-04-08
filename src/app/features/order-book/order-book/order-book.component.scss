@@ -6,6 +6,10 @@
   box-shadow: var(--card-shadow);
   overflow: hidden;
   background-color: var(--card-bg);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 300px;
   
   &__header {
     display: flex;
@@ -14,6 +18,7 @@
     padding: 10px 15px;
     background: var(--bg-tertiary);
     border-bottom: 1px solid var(--border-color);
+    flex-shrink: 0;
   }
 }
 
@@ -34,13 +39,23 @@ h3 {
 
 .order-book-content {
   padding: 10px;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.loader-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-grow: 1;
 }
 
 .book-container {
   display: flex;
   flex-direction: column;
+  flex-grow: 1;
   
-  /* Shows bids and asks side by side on medium and large screens */
   @media (min-width: $breakpoint-sm) {
     flex-direction: row;
     justify-content: space-between;
@@ -50,6 +65,8 @@ h3 {
 .bids, .asks {
   flex: 1;
   width: 100%;
+  display: flex;
+  flex-direction: column;
   
   @media (min-width: $breakpoint-sm) {
     max-width: 48%;
@@ -59,6 +76,7 @@ h3 {
 .table-title {
   margin-left: 5px;
   color: var(--text-primary);
+  flex-shrink: 0;
 }
 
 /* Add margin between bids and asks on small screens */
@@ -75,6 +93,7 @@ h3 {
   border-bottom: 1px solid var(--border-color);
   font-weight: bold;
   padding: 5px 0;
+  flex-shrink: 0;
 
   .col {
     color: var(--text-secondary);
@@ -109,4 +128,8 @@ h3 {
   text-align: center;
   color: var(--text-muted);
   font-style: italic;
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 } 
