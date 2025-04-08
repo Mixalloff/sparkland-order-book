@@ -98,4 +98,55 @@ describe('OrderBookComponent', () => {
     // Assert
     expect(webSocketServiceMock.closeConnection).toHaveBeenCalledWith('BTCUSDT');
   });
+
+  it('should display error message when error state is true', () => {
+    // Arrange
+    component.isError.set(true);
+    component.isLoading.set(false);
+    
+    // Act
+    fixture.detectChanges();
+    
+    // Assert
+    const errorContainer = ngMocks.find(fixture, '.error-container');
+    expect(errorContainer).toBeTruthy();
+    
+    const reconnectButton = ngMocks.find(errorContainer, '.error-container__reconnect-btn');
+    expect(reconnectButton).toBeTruthy();
+  });
+
+  it('should attempt reconnection when retry button is clicked', () => {
+    // Arrange
+    component.isError.set(true);
+    fixture.detectChanges();
+    
+    spyOn<any>(component, 'onReconnect').and.callThrough();
+    
+    // Act
+    const reconnectButton = ngMocks.find(fixture, '.error-container__reconnect-btn');
+    ngMocks.click(reconnectButton);
+    
+    // Assert
+    expect(component.onReconnect).toHaveBeenCalled();
+  });
+
+  it('should clear error state after successful reconnection', () => {
+    // Arrange
+    component.isError.set(true);
+    fixture.detectChanges();
+    
+    // Reset mock to return successful data
+    webSocketServiceMock.getOrderBookStream.and.returnValue(of(mockOrderBookData));
+    
+    // Act
+    component.onReconnect();
+    fixture.detectChanges();
+    
+    // Assert
+    expect(component.isError()).toBeFalse();
+    expect(() => ngMocks.find(fixture, '.error-container')).toThrow();
+    
+    const bidsElements = ngMocks.findAll(fixture, '.bids .table-row');
+    expect(bidsElements.length).toBeGreaterThan(0);
+  });
 }); 
