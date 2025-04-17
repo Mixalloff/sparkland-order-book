@@ -1,5 +1,5 @@
 import { OrderBookComponent } from './order-book.component';
-import { WebSocketService } from '@services/websocket.service';
+import { OrderBookFacade } from '@features/order-book/services/order-book.facade';
 import { of } from 'rxjs';
 import { OrderBookWebSocketData } from '@models/order-book.model';
 import { MockBuilder, MockRender, MockProvider, ngMocks, MockedComponentFixture } from 'ng-mocks';
@@ -7,7 +7,7 @@ import { MockBuilder, MockRender, MockProvider, ngMocks, MockedComponentFixture 
 describe('OrderBookComponent', () => {
   let component: OrderBookComponent;
   let fixture: MockedComponentFixture<OrderBookComponent, { symbol: string }>;
-  let webSocketServiceMock: jasmine.SpyObj<WebSocketService>;
+  let orderBookFacadeMock: jasmine.SpyObj<OrderBookFacade>;
 
   const mockOrderBookData: OrderBookWebSocketData = {
     lastUpdateId: 123456789,
@@ -18,9 +18,13 @@ describe('OrderBookComponent', () => {
   beforeEach(() => {
     return MockBuilder(OrderBookComponent)
       .provide(
-        MockProvider(WebSocketService, {
+        MockProvider(OrderBookFacade, {
           getOrderBookStream: jasmine.createSpy('getOrderBookStream').and.returnValue(of(mockOrderBookData)),
-          closeConnection: jasmine.createSpy('closeConnection')
+          closeConnection: jasmine.createSpy('closeConnection'),
+          mapOrderLevel: jasmine.createSpy('mapOrderLevel').and.callFake((level) => ({
+            price: level[0],
+            quantity: level[1]
+          }))
         })
       );
   });
@@ -31,7 +35,7 @@ describe('OrderBookComponent', () => {
       symbol: 'BTCUSDT',
     });
     component = fixture.point.componentInstance;
-    webSocketServiceMock = ngMocks.findInstance(WebSocketService) as jasmine.SpyObj<WebSocketService>;
+    orderBookFacadeMock = ngMocks.findInstance(OrderBookFacade) as jasmine.SpyObj<OrderBookFacade>;
   });
 
   it('should create', () => {
@@ -83,12 +87,12 @@ describe('OrderBookComponent', () => {
     expect(ngMocks.formatText(ngMocks.find(asksElements[0], '.price'))).toContain('20001');
   });
 
-  it('should call WebSocketService.getOrderBookStream with correct symbol', () => {
+  it('should call OrderBookFacade.getOrderBookStream with correct symbol', () => {
     // Act
     component.ngOnInit();
     
     // Assert
-    expect(webSocketServiceMock.getOrderBookStream).toHaveBeenCalledWith('BTCUSDT');
+    expect(orderBookFacadeMock.getOrderBookStream).toHaveBeenCalledWith('BTCUSDT');
   });
 
   it('should close WebSocket connection on component destroy', () => {
@@ -96,7 +100,7 @@ describe('OrderBookComponent', () => {
     component.ngOnDestroy();
     
     // Assert
-    expect(webSocketServiceMock.closeConnection).toHaveBeenCalledWith('BTCUSDT');
+    expect(orderBookFacadeMock.closeConnection).toHaveBeenCalledWith('BTCUSDT');
   });
 
   it('should display error message when error state is true', () => {
@@ -120,7 +124,7 @@ describe('OrderBookComponent', () => {
     component.isError.set(true);
     fixture.detectChanges();
     
-    spyOn<any>(component, 'onReconnect').and.callThrough();
+    spyOn(component, 'onReconnect').and.callThrough();
     
     // Act
     const reconnectButton = ngMocks.find(fixture, '.error-container__reconnect-btn');
@@ -135,9 +139,6 @@ describe('OrderBookComponent', () => {
     component.isError.set(true);
     fixture.detectChanges();
     
-    // Reset mock to return successful data
-    webSocketServiceMock.getOrderBookStream.and.returnValue(of(mockOrderBookData));
-    
     // Act
     component.onReconnect();
     fixture.detectChanges();
@@ -148,5 +149,18 @@ describe('OrderBookComponent', () => {
     
     const bidsElements = ngMocks.findAll(fixture, '.bids .table-row');
     expect(bidsElements.length).toBeGreaterThan(0);
+  });
+
+  it('should emit remove event when remove button is clicked', () => {
+    // Arrange
+    spyOn(component.remove, 'emit');
+    fixture.detectChanges();
+    
+    // Act
+    const removeButton = ngMocks.find(fixture, '.remove-btn');
+    ngMocks.click(removeButton);
+    
+    // Assert
+    expect(component.remove.emit).toHaveBeenCalled();
   });
 }); 

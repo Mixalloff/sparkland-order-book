@@ -1,9 +1,9 @@
 import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, inject, signal, DestroyRef, input, output } from '@angular/core';
-import { OrderBookData, OrderBookLevel, OrderBookWebSocketData } from '@models/order-book.model';
+import { OrderBookData, OrderBookWebSocketData } from '@models/order-book.model';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { WebSocketService } from '@services/websocket.service';
 import { LoaderComponent } from '@shared/loader/loader.component';
 import { EMPTY, Subscription, catchError, finalize, retry, take, tap, timer } from 'rxjs';
+import { OrderBookFacade } from '@features/order-book/services/order-book.facade';
 
 @Component({
   selector: 'sprk-order-book',
@@ -29,7 +29,7 @@ export class OrderBookComponent implements OnInit, OnDestroy {
   private lastMessageTime!: number;
   private pingTimeoutSubscription!: Subscription;
   
-  private readonly webSocketService = inject(WebSocketService);
+  private readonly orderBookFacade = inject(OrderBookFacade);
   private readonly destroyRef = inject(DestroyRef);
   
   ngOnInit(): void {
@@ -52,11 +52,11 @@ export class OrderBookComponent implements OnInit, OnDestroy {
     const RETRY_TIMES = 5;
     const RETRY_DELAY = 2000;
 
-    const stream$ = this.webSocketService.getOrderBookStream(this.symbol());
+    const stream$ = this.orderBookFacade.getOrderBookStream(this.symbol());
     this.isError.set(false);
     this.isLoading.set(true);
 
-    // Set isLoading to false after the first data is received
+    // Set isLoading to false after the first data is received and start checking for connection timeout
     stream$.pipe(
       takeUntilDestroyed(this.destroyRef),
       take(1),
@@ -104,7 +104,7 @@ export class OrderBookComponent implements OnInit, OnDestroy {
   }
   
   private disconnectFromOrderBookStream(): void {
-    this.webSocketService.closeConnection(this.symbol());
+    this.orderBookFacade.closeConnection(this.symbol());
   }
   
   private updateOrderBook(data: OrderBookWebSocketData): void {
@@ -116,16 +116,9 @@ export class OrderBookComponent implements OnInit, OnDestroy {
     this.orderBookData.update(() => {
       return {
         lastUpdateId: data.lastUpdateId,
-        bids: data.bids.map(this.mapOrderLevel),
-        asks: data.asks.map(this.mapOrderLevel)
+        bids: data.bids.map(this.orderBookFacade.mapOrderLevel),
+        asks: data.asks.map(this.orderBookFacade.mapOrderLevel),
       };
     });
-  }
-  
-  private mapOrderLevel(level: string[]): OrderBookLevel {
-    return {
-      price: level[0],
-      quantity: level[1],
-    };
   }
 } 
